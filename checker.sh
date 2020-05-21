@@ -11,7 +11,7 @@ log(){
 loop_parser(){
     while true
     do
-        result=$(curl -s https://api.github.com/repos/v2ray/v2ray-core/releases/latest | grep "$1" | cut -d '"' -f 4)
+        result=$(curl -H "Authorization: token ${GH_TOKEN}" -s https://api.github.com/repos/v2ray/v2ray-core/releases/latest | grep "$1" | cut -d '"' -f 4)
         if [ ! -z "$result" ]; then
             echo $result
             break
@@ -19,15 +19,22 @@ loop_parser(){
     done
 }
 
+if [[ "$DEBUG_DOWNLOAD"x = "true"x ]] ; then
+  echo "debug DEBUG_DOWNLOAD .... "
+  curl -s https://api.github.com/rate_limit
+  curl -s -H "Authorization: token ${GH_TOKEN}" https://api.github.com/repos/ethereum/remix-desktop/releases/latest
+  exit 1
+fi
+
 log 'parser v2ray download url'
 
 DOWNLOAD_URL=$( loop_parser 'browser_download_url.*macos.zip"$' )
 
 if [ -z "$DOWNLOAD_URL" ]; then
-    
+
     log 'parser download url error, skip update.'
     exit 0
-    
+
 fi
 
 log "download url: $DOWNLOAD_URL  start downloading..."
@@ -47,16 +54,16 @@ V_VERSION=$( loop_parser "tag_name" )
 V_VERSION=$(echo ${V_VERSION:1})
 
 if [ -z "$V_VERSION" ]; then
-    
+
     log 'parser file version error, skip update.'
     exit 0
-    
+
 fi
 
 
 log "file version: $V_VERSION start clone..."
 
-git clone https://github.com/v2ray/homebrew-v2ray.git
+git clone https://github.com/yuanmomo/homebrew-v2ray.git
 
 log "update config...."
 
