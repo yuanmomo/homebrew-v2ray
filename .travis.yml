@@ -9,4 +9,4 @@ before_install:
 
 script:
   - chmod +x checker.sh
-  - ./checker.sh
+  - bash -vx checker.sh
